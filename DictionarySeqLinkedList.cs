@@ -186,12 +186,14 @@ namespace IDictionarySeq
         {
             var node = new CustomLinkedListNode<T>(value);
             Len++;
-            initialize(node);
+            if (!initialize(node))
+            {
 
-            node.Previos = LastNode;
-            LastNode.Next = node;
-            LastNode = node;
 
+                node.Previos = LastNode;
+                LastNode.Next = node;
+                LastNode = node;
+            }
             return node;
         }
 
@@ -220,6 +222,13 @@ namespace IDictionarySeq
             {
                 LastNode = node.Previos;
             }
+             
+            if ((node.Previos == null) & (node.Next != null))
+            {
+                initialized = false;
+                FirstNode = null;
+                LastNode = null;
+            }
 
             if (node.Previos != null)
                 node.Previos.Next = node.Next;
@@ -232,14 +241,17 @@ namespace IDictionarySeq
         /// Инициализирует список указанным элементом
         /// </summary>
         /// <param name="node">Элемент для инициализации списка</param>
-        private void initialize(CustomLinkedListNode<T> node)
+        private bool initialize(CustomLinkedListNode<T> node)
         {
             if (!initialized)
             {
                 FirstNode = node;
                 LastNode = node;
                 initialized = true;
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
