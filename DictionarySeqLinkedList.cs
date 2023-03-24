@@ -185,15 +185,14 @@ namespace IDictionarySeq
         public CustomLinkedListNode<T> AddLast(T value)
         {
             var node = new CustomLinkedListNode<T>(value);
-            Len++;
+          
             if (!initialize(node))
             {
-
-
                 node.Previos = LastNode;
                 LastNode.Next = node;
                 LastNode = node;
             }
+            Len++;
             return node;
         }
 
@@ -202,7 +201,9 @@ namespace IDictionarySeq
         /// </summary>
         public void Clear()
         {
-
+            Len = 0;
+            FirstNode = null;
+            LastNode = null;
         }
 
         /// <summary>
@@ -216,18 +217,19 @@ namespace IDictionarySeq
             {
                 FirstNode = node.Next;
             }
-            Len--;
+
             //Проверяем ссылку на LastNode
             if (node == LastNode)
             {
                 LastNode = node.Previos;
             }
              
-            if ((node.Previos == null) & (node.Next != null))
+            if ((node.Previos == null) & (node.Next == null))
             {
                 initialized = false;
                 FirstNode = null;
                 LastNode = null;
+                Len = 0;
             }
 
             if (node.Previos != null)
@@ -235,6 +237,8 @@ namespace IDictionarySeq
 
             if (node.Next != null)
                 node.Next.Previos = node.Previos;
+            
+            Len--;
         }
 
         /// <summary>
@@ -248,6 +252,8 @@ namespace IDictionarySeq
                 FirstNode = node;
                 LastNode = node;
                 initialized = true;
+                Len = 0;
+
                 return true;
             }
 
