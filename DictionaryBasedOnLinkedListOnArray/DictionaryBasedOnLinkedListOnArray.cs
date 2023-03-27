@@ -121,8 +121,14 @@ namespace IDictionarySeq
                     var item = enumerator.Current;
 
                     var hash = GetElementIndex(item.Value.Key);
-                    var pos_in_list = _list.GetNodePosition(item);
 
+
+                    //Если получаем коллизию на этапе расширения массива - увеличиваем размер еще раз
+                    if (resKeys[hash] != -1)
+                        IncreaseArraysSize();
+
+
+                    var pos_in_list = _list.GetNodePosition(item);
                     resKeys[hash] = pos_in_list.Value;
                 }
             }
