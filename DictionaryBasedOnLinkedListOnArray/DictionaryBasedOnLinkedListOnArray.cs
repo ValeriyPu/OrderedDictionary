@@ -1,5 +1,4 @@
 ﻿using IDictionarySeq.CustomLinkedListBasedOnArray;
-using System.Net.WebSockets;
 
 namespace IDictionarySeq
 {
@@ -7,11 +6,12 @@ namespace IDictionarySeq
 
     /// <summary>
     /// Кастомный словарь с сохранением порядка вставки элементов при перечислении значений]
-    /// Более трудоемкий вариант, приходится переопределять практически все методы интерфейса
+    /// Полностью кастомный словарь )
     /// </summary>
     /// <typeparam name="T">Тип ключа</typeparam>
     /// <typeparam name="U">Тип значения</typeparam>
     internal class DictionaryBasedOnLinkedListOnArray<T, U>
+        where T : IEquatable<T>
     {
         public DictionaryBasedOnLinkedListOnArray()
         {
@@ -38,7 +38,11 @@ namespace IDictionarySeq
         /// </summary>
         private int[] _keysList;
 
-
+        /// <summary>
+        /// Hash-функция, получающая номер хеш ключа
+        /// </summary>
+        /// <param name="key">ключ</param>
+        /// <returns>хэш ключа</returns>
         private int GetElementIndex(T key)
         {
             var hashcode = key.GetHashCode();
@@ -47,13 +51,23 @@ namespace IDictionarySeq
             return keyhash;
         }
 
+        /// <summary>
+        /// Добваляет элемент в словарь 
+        /// </summary>
+        /// <param name="key">ключ</param>
+        /// <param name="value">значение</param>
         private void AddElement(T key, U value)
         {
             var index= GetElementIndex(key);
-            if ((_keysList[index]!=-1)||(_list.Capacity<=_list.Count+1))
+            if ((_keysList[index] != -1) && (!_list[_keysList[index]].Value.Key.Equals(key))
+                ||(_list.Capacity<=_list.Count+1))
             {
                 IncreaseArraysSize();
                 AddElement(key, value);
+            }
+            else if (_list[_keysList[index]].Value.Key.Equals(key))
+            {
+                throw new Exception("Duplicate key");
             }
             else
             {
@@ -63,6 +77,10 @@ namespace IDictionarySeq
             }
         }
 
+        /// <summary>
+        /// Удаляет элемент из словаря
+        /// </summary>
+        /// <param name="key"></param>
         private void RemoveElement(T key)
         {
             var index = GetElementIndex(key);
@@ -80,6 +98,10 @@ namespace IDictionarySeq
             return elem.Value.Value;
         }
 
+        /// <summary>
+        /// Увеличивает размер массивов в 2 раза
+        /// Обновляет связи между таблицей ключей и индексами в таблице с двусвязным списком
+        /// </summary>
         private void IncreaseArraysSize()
         {
             _list.ReinitializeArray();
@@ -88,7 +110,7 @@ namespace IDictionarySeq
 
             initKeyList(resKeys, 0, -1);
 
-
+            //Перехэширование всех элементов, что поделать )
             if (_list.Count != 0)
             {
                 var enumerator = _list.GetRawEnumerator();
@@ -108,14 +130,22 @@ namespace IDictionarySeq
             _keysList = resKeys;
         }
 
+        private readonly object _lock = new object();
+
         public void Add(T key, U value)
         {
-            AddElement(key, value);
+            lock (_lock)
+            {
+                AddElement(key, value);
+            }
         }
 
         public void Remove(T key)
         {
-            RemoveElement(key);
+            lock (_lock)
+            {
+                RemoveElement(key);
+            }
         }
 
         public IEnumerable<KeyValuePair<T, U>> Values => _list;
