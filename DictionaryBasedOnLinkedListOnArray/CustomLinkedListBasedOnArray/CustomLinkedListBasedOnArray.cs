@@ -33,8 +33,14 @@ namespace IDictionarySeq.CustomLinkedListBasedOnArray
         /// </int>
         public int? LastNode;
 
+        /// <summary>
+        /// Количество элементов (активных) в массиве
+        /// </summary>
         public int Count => Len;
 
+        /// <summary>
+        /// Общая емкость массива для хранения двусвязного списка
+        /// </summary>
         public int Capacity => values.Length;
 
         public bool IsReadOnly => false;
@@ -239,6 +245,11 @@ namespace IDictionarySeq.CustomLinkedListBasedOnArray
 
                 values[key] = oldNode;
             }
+        }
+
+        public void SetValue(int pos, T value)
+        {
+            values[pos].Value = value;
         }
 
         /// <summary>
