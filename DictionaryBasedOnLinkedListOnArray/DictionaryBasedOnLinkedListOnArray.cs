@@ -148,6 +148,22 @@ namespace IDictionarySeq
             }
         }
 
+        public U this[T key]
+        {
+            get
+            {
+                return GetElement(key);
+            }
+            set
+            {
+                lock (_lock)
+                {
+                    var elem = GetElementIndex(key);
+                    _list.SetValue(elem, new KeyValuePair<T, U>(key, value));
+                }
+                
+            }
+        }
         public IEnumerable<KeyValuePair<T, U>> Values => _list;
     }
 }
